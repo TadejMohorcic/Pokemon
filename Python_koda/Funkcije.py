@@ -3,7 +3,7 @@ import re
 import os
 import csv
 
-mapa_podatki = "zajeti_podatki"
+mapa_podatki = "Zajeti_podatki"
 pokemoni = "pokemoni.html"
 poteze = "moves.html"
 abilities = "abilities.html"
