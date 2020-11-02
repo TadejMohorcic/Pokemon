@@ -1,47 +1,48 @@
 import requests
-import re
 import os
 import csv
+import json
+import sys
 
-mapa_podatki = "Zajeti_podatki"
-pokemoni = "pokemoni.html"
-poteze = "moves.html"
-abilities = "abilities.html"
-url_pokemoni = "https://play.pokemonshowdown.com/data/pokedex.js"
-url_poteze = "https://play.pokemonshowdown.com/data/moves.js"
-url_abilities = "https://play.pokemonshowdown.com/data/abilities.js"
+def pripravi_imenik(ime_datoteke):
+    '''Če še ne obstaja, pripravi prazen imenik za dano datoteko.'''
+    imenik = os.path.dirname(ime_datoteke)
+    if imenik:
+        os.makedirs(imenik, exist_ok=True)  
 
-def nalozi_spletno_stran(url):
+def shrani_spletno_stran(url, ime_datoteke, vsili_prenos=False):
+    '''Vsebino strani na danem naslovu shrani v datoteko z danim imenom.'''
     try:
-        vsebina_strani = requests.get(url)
-    except Exception as e:
-        print("Prišlo je do napake!")
-        print(e)
-        return None
-    if vsebina_strani.status_code == requests.codes["ok"]:
-        return vsebina_strani.text
+        print(f'Shranjujem {url} ...', end='')
+        sys.stdout.flush()
+        if os.path.isfile(ime_datoteke) and not vsili_prenos:
+            print('shranjeno že od prej!')
+            return
+        r = requests.get(url)
+    except requests.exceptions.ConnectionError:
+        print('stran ne obstaja!')
     else:
-        print("Težava pri nalaganju spletne strani.")
-        return None
+        pripravi_imenik(ime_datoteke)
+        with open(ime_datoteke, 'w', encoding='utf-8') as datoteka:
+            datoteka.write(r.text)
+            print('shranjeno!')
 
-def shrani_spletno_stran(text, directory, filename):
-    os.makedirs(directory, exist_ok=True)
-    path = os.path.join(directory, filename)
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(text)
-    return None
+def vsebina_datoteke(ime_datoteke):
+    '''Vrne niz z vsebino datoteke z danim imenom.'''
+    with open(ime_datoteke, encoding='utf-8') as datoteka:
+        return datoteka.read()
 
-def shrani_v_datoteko(page, directory, filename):
-    html = nalozi_spletno_stran(page)
-    if html:
-        shrani_spletno_stran(html, directory, filename)
-        return True
-    return False
+def zapisi_csv(slovarji, imena_polj, ime_datoteke):
+    '''Iz seznama slovarjev ustvari CSV datoteko z glavo.'''
+    pripravi_imenik(ime_datoteke)
+    with open(ime_datoteke, 'w', encoding='utf-8') as csv_datoteka:
+        writer = csv.DictWriter(csv_datoteka, fieldnames=imena_polj)
+        writer.writeheader()
+        for slovar in slovarji:
+            writer.writerow(slovar)
 
-def main(redownload=True, reparse=True):
-    shrani_v_datoteko(url_pokemoni, mapa_podatki, pokemoni)
-    shrani_v_datoteko(url_poteze, mapa_podatki, poteze)
-    shrani_v_datoteko(url_abilities, mapa_podatki, abilities)
-
-if __name__ == "__main__":
-    main()
+def zapisi_json(objekt, ime_datoteke):
+    '''Iz danega objekta ustvari JSON datoteko.'''
+    pripravi_imenik(ime_datoteke)
+    with open(ime_datoteke, 'w', encoding='utf-8') as json_datoteka:
+        json.dump(objekt, json_datoteka, indent=4, ensure_ascii=False)
