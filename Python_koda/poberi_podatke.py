@@ -50,6 +50,23 @@ def izloci_podatke_pokemona(blok):
             pokemon["ability1"] = pokemon["ability1"][0][2:]
         else:
             pokemon["ability1"] = pokemon["ability1"][0][2:]
+        #pokemonom dodamo generacijo v kateri so se pojavili
+        if pokemon["id"] < 152:
+            pokemon["generation"] = 1
+        elif pokemon["id"] < 252:
+            pokemon["generation"] = 2
+        elif pokemon["id"] < 387:
+            pokemon["generation"] = 3
+        elif pokemon["id"] < 494:
+            pokemon["generation"] = 4
+        elif pokemon["id"] < 650:
+            pokemon["generation"] = 5
+        elif pokemon["id"] < 722:
+            pokemon["generation"] = 6
+        elif pokemon["id"] < 810:
+            pokemon["generation"] = 7
+        else:
+            pokemon["generation"] = 8
         #vrnemo le pokemone z pozitivnim id-jem, na strani so tudi fan-made pokemoni, ki imajo to vrednost negativno
         if pokemon["id"] > 0:
             return pokemon
@@ -75,6 +92,6 @@ for pokemon in st_pokemonov():
 funkcije.zapisi_json(pokemoni, "obdelani_podatki/pokemoni.json")
 funkcije.zapisi_csv(
     pokemoni,
-    ["id", "name", "type1", "type2", "hp", "attack", "defense", "speed", "attack_special", "defense_special", "ability1", "ability2", "height", "weight"], "obdelani_podatki/pokemoni.csv"
+    ["id", "name", "type1", "type2", "hp", "attack", "defense", "speed", "attack_special", "defense_special", "ability1", "ability2", "generation", "height", "weight"], "obdelani_podatki/pokemoni.csv"
 )
 
