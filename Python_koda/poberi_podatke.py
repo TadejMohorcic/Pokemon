@@ -11,12 +11,12 @@ vzorec_bloka_pokemon = re.compile(
 )
 
 vzorec_pokemona = re.compile(
-    r'num:(?P<id>\d+),.*?'
-    r'name:(?P<name>.*?),.*?'
+    r'num:(?P<ID>\d+),.*?'
+    r'name:(?P<Name>.*?),.*?'
     r'types:\[(?P<type1>.*?)\],.*?'
-    r'baseStats:\{hp:(?P<hp>\d+),atk:(?P<attack>\d+),def:(?P<defense>\d+),spa:(?P<attack_special>\d+),spd:(?P<defense_special>\d+),spe:(?P<speed>\d+)\},.*?'
+    r'baseStats:\{hp:(?P<HP>\d+),atk:(?P<Attack>\d+),def:(?P<Defense>\d+),spa:(?P<Attack_special>\d+),spd:(?P<Defense_special>\d+),spe:(?P<Speed>\d+)\},.*?'
     r'abilities:\{(?P<ability1>.*?)\},.*?'
-    r'heightm:(?P<height>.*?),weightkg:(?P<weight>.*?),.*?',
+    r'heightm:(?P<Height>.*?),weightkg:(?P<Weight>.*?),.*?',
     flags=re.DOTALL
 )
 
@@ -24,8 +24,8 @@ def izloci_podatke_pokemona(blok):
     try:
         pokemon = vzorec_pokemona.search(blok).groupdict()
         #popravimo id in ime pokemona
-        pokemon["id"] = int(pokemon["id"])
-        pokemon["name"] = pokemon["name"].replace('"', '').replace('\\', '')
+        pokemon["ID"] = int(pokemon["ID"])
+        pokemon["Name"] = pokemon["Name"].replace('"', '').replace('\\', '')
         #pogledamo ce ima pokemon vec tipov, ce jih ima jih locimo
         pokemon["type1"] = pokemon["type1"].replace('"', '').replace('\\', '').split(",")
         if len(pokemon["type1"]) > 1:
@@ -34,14 +34,14 @@ def izloci_podatke_pokemona(blok):
         else:
             pokemon["type1"] = pokemon["type1"][0]
         #popravimo ostale podatke, ki morajo biti stevilke
-        pokemon["hp"] = int(pokemon["hp"])
-        pokemon["attack"] = int(pokemon["attack"])
-        pokemon["defense"] = int(pokemon["defense"])
-        pokemon["attack_special"] = int(pokemon["attack_special"])
-        pokemon["defense_special"] = int(pokemon["defense_special"])
-        pokemon["speed"] = int(pokemon["speed"])
-        pokemon["height"] = float(pokemon["height"])
-        pokemon["weight"] = float(pokemon["weight"])
+        pokemon["HP"] = int(pokemon["HP"])
+        pokemon["Attack"] = int(pokemon["Attack"])
+        pokemon["Defense"] = int(pokemon["Defense"])
+        pokemon["Attack_special"] = int(pokemon["Attack_special"])
+        pokemon["Defense_special"] = int(pokemon["Defense_special"])
+        pokemon["Speed"] = int(pokemon["Speed"])
+        pokemon["Height"] = float(pokemon["Height"])
+        pokemon["Weight"] = float(pokemon["Weight"])
         #podobno kot pri tipu pokemona pogledamo koliko ima ablilitijev, ce jih je vec to ustrezno popravimo
         #vemo, da imajo pokemoni največ 2 ability-ja, hkrati pa vemo, da sta prva dva znaka stringa abiliti stevilka in :, zato ju odstranimo
         pokemon["ability1"] = pokemon["ability1"].replace('"', '').replace('\\', '').split(",")
@@ -51,24 +51,24 @@ def izloci_podatke_pokemona(blok):
         else:
             pokemon["ability1"] = pokemon["ability1"][0][2:]
         #pokemonom dodamo generacijo v kateri so se pojavili
-        if pokemon["id"] < 152:
-            pokemon["generation"] = 1
-        elif pokemon["id"] < 252:
-            pokemon["generation"] = 2
-        elif pokemon["id"] < 387:
-            pokemon["generation"] = 3
-        elif pokemon["id"] < 494:
-            pokemon["generation"] = 4
-        elif pokemon["id"] < 650:
-            pokemon["generation"] = 5
-        elif pokemon["id"] < 722:
-            pokemon["generation"] = 6
-        elif pokemon["id"] < 810:
-            pokemon["generation"] = 7
+        if pokemon["ID"] < 152:
+            pokemon["Generation"] = 1
+        elif pokemon["ID"] < 252:
+            pokemon["Generation"] = 2
+        elif pokemon["ID"] < 387:
+            pokemon["Generation"] = 3
+        elif pokemon["ID"] < 494:
+            pokemon["Generation"] = 4
+        elif pokemon["ID"] < 650:
+            pokemon["Generation"] = 5
+        elif pokemon["ID"] < 722:
+            pokemon["Generation"] = 6
+        elif pokemon["ID"] < 810:
+            pokemon["Generation"] = 7
         else:
-            pokemon["generation"] = 8
+            pokemon["Generation"] = 8
         #vrnemo le pokemone z pozitivnim id-jem, na strani so tudi fan-made pokemoni, ki imajo to vrednost negativno
-        if pokemon["id"] > 0:
+        if pokemon["ID"] > 0:
             return pokemon
         else:
             return None
@@ -92,6 +92,6 @@ for pokemon in st_pokemonov():
 funkcije.zapisi_json(pokemoni, "obdelani_podatki/pokemoni.json")
 funkcije.zapisi_csv(
     pokemoni,
-    ["id", "name", "type1", "type2", "hp", "attack", "defense", "speed", "attack_special", "defense_special", "ability1", "ability2", "generation", "height", "weight"], "obdelani_podatki/pokemoni.csv"
+    ["ID", "Name", "type1", "type2", "HP", "Attack", "Defense", "Speed", "Attack_special", "Defense_special", "ability1", "ability2", "Generation", "Height", "Weight"], "obdelani_podatki/pokemoni.csv"
 )
 
