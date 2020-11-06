@@ -29,7 +29,7 @@ def izloci_podatke_pokemona(blok):
         #pogledamo ce ima pokemon vec tipov, ce jih ima jih locimo
         pokemon["type1"] = pokemon["type1"].replace('"', '').replace('\\', '').split(",")
         if len(pokemon["type1"]) > 1:
-            pokemon["type2"] = pokemon["type1"][1]
+            pokemon["Type 2"] = pokemon["type1"][1]
             pokemon["type1"] = pokemon["type1"][0]
         else:
             pokemon["type1"] = pokemon["type1"][0]
@@ -46,7 +46,7 @@ def izloci_podatke_pokemona(blok):
         #vemo, da imajo pokemoni največ 2 ability-ja, hkrati pa vemo, da sta prva dva znaka stringa abiliti stevilka in :, zato ju odstranimo
         pokemon["ability1"] = pokemon["ability1"].replace('"', '').replace('\\', '').split(",")
         if len(pokemon["ability1"]) > 1:
-            pokemon["ability2"] = pokemon["ability1"][1][2:]
+            pokemon["Ability 2"] = pokemon["ability1"][1][2:]
             pokemon["ability1"] = pokemon["ability1"][0][2:]
         else:
             pokemon["ability1"] = pokemon["ability1"][0][2:]
@@ -92,6 +92,6 @@ for pokemon in st_pokemonov():
 funkcije.zapisi_json(pokemoni, "obdelani_podatki/pokemoni.json")
 funkcije.zapisi_csv(
     pokemoni,
-    ["ID", "Name", "type1", "type2", "HP", "Attack", "Defense", "Speed", "Attack_special", "Defense_special", "ability1", "ability2", "Generation", "Height", "Weight"], "obdelani_podatki/pokemoni.csv"
+    ["ID", "Name", "type1", "Type 2", "HP", "Attack", "Defense", "Speed", "Attack_special", "Defense_special", "ability1", "Ability 2", "Generation", "Height", "Weight"], "obdelani_podatki/pokemoni.csv"
 )
 

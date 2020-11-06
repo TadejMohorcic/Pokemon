@@ -1,4 +1,4 @@
-ID,Name,type1,type2,HP,Attack,Defense,Speed,Attack_special,Defense_special,ability1,ability2,Generation,Height,Weight
+ID,Name,type1,Type 2,HP,Attack,Defense,Speed,Attack_special,Defense_special,ability1,Ability 2,Generation,Height,Weight
 1,Bulbasaur,Grass,Poison,45,49,49,45,65,65,Overgrow,Chlorophyll,1,0.7,6.9
 2,Ivysaur,Grass,Poison,60,62,63,60,80,80,Overgrow,Chlorophyll,1,1.0,13.0
 3,Venusaur,Grass,Poison,80,82,83,80,100,100,Overgrow,Chlorophyll,1,2.0,100.0
