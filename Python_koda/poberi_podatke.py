@@ -173,6 +173,7 @@ moves = []
 for move in st_moves():
     if move != None:
         moves.append(move)
+moves = sorted(moves, key=lambda x : x["ID"], reverse=False)
 funkcije.zapisi_json(moves, "obdelani_podatki/moves.json")
 funkcije.zapisi_csv(
     moves,
