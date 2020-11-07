@@ -2,8 +2,8 @@ import re
 import funkcije
 
 
-url_poteze = "https://play.pokemonshowdown.com/data/moves.js"
-url_abilities = "https://play.pokemonshowdown.com/data/abilities.js"
+#====================================================================================================
+#Vzorci za regex
 
 vzorec_bloka_pokemon = re.compile(
     r'.:{num:.*?,tier:.*?},',
@@ -20,37 +20,72 @@ vzorec_pokemona = re.compile(
     flags=re.DOTALL
 )
 
+vzorec_bloka_moves = re.compile(
+    r':\{num.*?,shortDesc:.*?}',
+    flags=re.DOTALL
+)
+
+vzorec_moves = re.compile(
+    r'num:(?P<ID>\d+),.*?'
+    r'accuracy:(?P<Accuracy>.*?),.*?'
+    r'basePower:(?P<BasePower>\d+),.*?'
+    r'category:(?P<Category>.*?),.*?'
+    r'name:(?P<Name>.*?),pp:(?P<PP>\d+),.*?'
+    r'type:(?P<Type>.*?),.*?'
+    r'desc:(?P<Description>.*?),.*?',
+    flags=re.DOTALL
+)
+
+#====================================================================================================
+#Pomožne funkcije
+
+def izloci_znake(niz):
+    return niz.replace('"', '').replace('\\', '')
+
+#====================================================================================================
+#Funkcija za pokemone
+
 def izloci_podatke_pokemona(blok):
     try:
         pokemon = vzorec_pokemona.search(blok).groupdict()
-        #popravimo id in ime pokemona
+        #Popravimo id in ime pokemona
         pokemon["ID"] = int(pokemon["ID"])
-        pokemon["Name"] = pokemon["Name"].replace('"', '').replace('\\', '')
-        #pogledamo ce ima pokemon vec tipov, ce jih ima jih locimo
-        pokemon["type1"] = pokemon["type1"].replace('"', '').replace('\\', '').split(",")
+        pokemon["Name"] = izloci_znake(pokemon["Name"])
+        #Pogledamo, če ima pokemon vec tipov, in če jih ima, ju ločimo
+        #Vemo pa, da ima pokemon največ 2 tipa
+        pokemon["type1"] = izloci_znake(pokemon["type1"]).split(",")
         if len(pokemon["type1"]) > 1:
             pokemon["Type 2"] = pokemon["type1"][1]
-            pokemon["type1"] = pokemon["type1"][0]
+            pokemon["Type 1"] = pokemon["type1"][0]
         else:
-            pokemon["type1"] = pokemon["type1"][0]
-        #popravimo ostale podatke, ki morajo biti stevilke
+            pokemon["Type 1"] = pokemon["type1"][0]
+        del pokemon["type1"]
+        #Popravimo ostale podatke, tako da nastanejo številke(int ali float)
         pokemon["HP"] = int(pokemon["HP"])
         pokemon["Attack"] = int(pokemon["Attack"])
         pokemon["Defense"] = int(pokemon["Defense"])
-        pokemon["Attack_special"] = int(pokemon["Attack_special"])
-        pokemon["Defense_special"] = int(pokemon["Defense_special"])
         pokemon["Speed"] = int(pokemon["Speed"])
         pokemon["Height"] = float(pokemon["Height"])
         pokemon["Weight"] = float(pokemon["Weight"])
-        #podobno kot pri tipu pokemona pogledamo koliko ima ablilitijev, ce jih je vec to ustrezno popravimo
-        #vemo, da imajo pokemoni največ 2 ability-ja, hkrati pa vemo, da sta prva dva znaka stringa abiliti stevilka in :, zato ju odstranimo
-        pokemon["ability1"] = pokemon["ability1"].replace('"', '').replace('\\', '').split(",")
-        if len(pokemon["ability1"]) > 1:
-            pokemon["Ability 2"] = pokemon["ability1"][1][2:]
-            pokemon["ability1"] = pokemon["ability1"][0][2:]
+        #Olepšamo ime za special attack and defense, ter izbrišemo nepotrebne
+        pokemon["Attack Special"] = int(pokemon["Attack_special"])
+        del pokemon["Attack_special"]
+        pokemon["Defense Special"] = int(pokemon["Defense_special"])
+        del pokemon["Defense_special"]
+        #Vemo, da ima pokemon največ 2 ability-je, kjer je zadnji vedno "Hidden", razen v primeru, ko ima pokemon le en ability
+        #Hkrati sta prva dva znaka v našem html-ju odveč, zato ju odstranimo
+        pokemon["ability1"] = izloci_znake(pokemon["ability1"]).split(",")
+        if len(pokemon["ability1"]) == 1:
+            pokemon["Ability 1"] = pokemon["ability1"][0][2:]
         else:
-            pokemon["ability1"] = pokemon["ability1"][0][2:]
-        #pokemonom dodamo generacijo v kateri so se pojavili
+            pokemon["Hidden Ability"] = pokemon["ability1"][-1][2:]
+            if len(pokemon["ability1"]) == 3:
+                pokemon["Ability 1"] = pokemon["ability1"][0][2:]
+                pokemon["Ability 2"] = pokemon["ability1"][1][2:]
+            else:
+                pokemon["Ability 1"] = pokemon["ability1"][0][2:]
+        del pokemon["ability1"]
+        #pokemonom dodamo generacijo v kateri so se pojavili prvic
         if pokemon["ID"] < 152:
             pokemon["Generation"] = 1
         elif pokemon["ID"] < 252:
@@ -75,7 +110,36 @@ def izloci_podatke_pokemona(blok):
     except:
         return None
 
+#====================================================================================================
+#Funkcija za poteze
 
+def izloci_podatke_moves(blok):
+    try:
+        move = vzorec_moves.search(blok).groupdict()
+        #Popravimo podatke, ki morajo biti številke v le te, ter nepotrebne izbrišemo(olepšam imena)
+        move["Base Power"] = int(move["BasePower"])
+        del move["BasePower"]
+        move["PP"] = int(move["PP"])
+        move["ID"] = int(move["ID"])
+        #Izločimo nepotrebne znake iz naših nizov
+        move["Category"] = izloci_znake(move["Category"])
+        move["Name"] = izloci_znake(move["Name"])
+        move["Type"] = izloci_znake(move["Type"])
+        move["Description"] = izloci_znake(move["Description"])
+        #Uredimo se accuracy, kjer se lahko pojavi številka (procent), ali pa true
+        try:
+            move["Accuracy"] = int(move["Accuracy"])
+        except:
+            move["Accuracy"] = move["Accuracy"].capitalize()
+        #Vrnemo le poteze s pozitivnim ID-jem, isti razlog kot zgoraj
+        if move["ID"] > 0:
+            return move
+        else:
+            return None
+    except:
+        return None
+
+#====================================================================================================
 
 def st_pokemonov():
     url_pokemoni = "https://play.pokemonshowdown.com/data/pokedex.js"
@@ -92,6 +156,25 @@ for pokemon in st_pokemonov():
 funkcije.zapisi_json(pokemoni, "obdelani_podatki/pokemoni.json")
 funkcije.zapisi_csv(
     pokemoni,
-    ["ID", "Name", "type1", "Type 2", "HP", "Attack", "Defense", "Speed", "Attack_special", "Defense_special", "ability1", "Ability 2", "Generation", "Height", "Weight"], "obdelani_podatki/pokemoni.csv"
+    ["ID", "Name", "Type 1", "Type 2", "HP", "Attack", "Defense", "Speed", "Attack Special", "Defense Special", "Ability 1", "Ability 2", "Hidden Ability", "Generation", "Height", "Weight"], "obdelani_podatki/pokemoni.csv"
 )
 
+#====================================================================================================
+
+def st_moves():
+    url_moves = "https://play.pokemonshowdown.com/data/moves.js"
+    ime_datoteke = "zajeti_podatki/moves.html"
+    funkcije.shrani_spletno_stran(url_moves, ime_datoteke)
+    vsebina = funkcije.vsebina_datoteke(ime_datoteke)
+    for blok in vzorec_bloka_moves.finditer(vsebina):
+        yield izloci_podatke_moves(blok.group(0))
+
+moves = []
+for move in st_moves():
+    if move != None:
+        moves.append(move)
+funkcije.zapisi_json(moves, "obdelani_podatki/moves.json")
+funkcije.zapisi_csv(
+    moves,
+    ["ID", "Name", "Type", "Category", "Accuracy", "Base Power", "PP", "Description"], "obdelani_podatki/moves.csv"
+)
