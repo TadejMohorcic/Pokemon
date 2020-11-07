@@ -32,7 +32,7 @@ vzorec_moves = re.compile(
     r'category:(?P<Category>.*?),.*?'
     r'name:(?P<Name>.*?),pp:(?P<PP>\d+),.*?'
     r'type:(?P<Type>.*?),.*?'
-    r'desc:(?P<Description>.*?),.*?',
+    r'desc:(?P<Description>.*?),shortDesc:.*?',
     flags=re.DOTALL
 )
 
