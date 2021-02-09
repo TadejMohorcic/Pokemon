@@ -4,10 +4,9 @@ Podatke bom vzel s strani [Pokemon Showdown](https://dex.pokemonshowdown.com/pok
 
 Zajel bom:
 - Tip pokemona (grass, water, ...)
-- Podatek o višini, teži, spolu
+- Podatek o višini, teži
 - Osnovno statistiko(HP, hitrost, ...)
-- Posebne zmožnosti in opis
-- Št. evolucij
+- Posebne zmožnosti
 
 Za poteze pa:
 - Tip poteze
@@ -16,6 +15,7 @@ Za poteze pa:
 - Opis
 
 Delovne hipoteze:
-- Ali obstaja najboljši tip pokemona (tj. najhitrejši, najmočnejši, največ HP...)
-- Ali so kakšni tipi potez boljši od drugih
-- Kaj pa če gledamo tip pokemona + tip poteze?
+- Ali obstaja najboljši tip pokemona?
+- Kaj pa najslabši?
+- Ali obstajajo bolši tipi potez
+- Kakšna naj bo ekipa, da bo čim bolj učinkovita
