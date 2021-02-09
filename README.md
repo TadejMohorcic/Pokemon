@@ -17,5 +17,5 @@ Za poteze pa:
 Delovne hipoteze:
 - Ali obstaja najboljši tip pokemona?
 - Kaj pa najslabši?
-- Ali obstajajo bolši tipi potez
+- Ali obstajajo boljši tipi potez?
 - Kakšna naj bo ekipa, da bo čim bolj učinkovita
